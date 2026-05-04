@@ -4,27 +4,27 @@ from datetime import datetime, timedelta
 from main_waf import main_waf
 from main_bot import main_bot
 
-# --- Configuración de Estilo y Página ---
+# --- Page Configuration ---
 st.set_page_config(
-    page_title="Autoreport Radware", 
+    page_title="Radware Autoreport", 
     page_icon="🌐", 
     layout="centered",
     initial_sidebar_state="collapsed"
 )
 
-# --- CSS Personalizado ---
+# --- Custom CSS ---
 st.markdown("""
     <style>
-    /* Fondo y fuente */
+    /* Background and Font */
     .main { background-color: #f8f9fa; }
     
-    /* MEJORA DE CALIDAD DE IMAGEN: Evita el suavizado borroso */
+    /* Image Quality Enhancement */
     img {
         image-rendering: -webkit-optimize-contrast;
         image-rendering: crisp-edges;
     }
 
-    /* Estilo para el contenedor de configuración (Cards) */
+    /* Configuration Card Style */
     div.stBlock {
         background-color: #ffffff;
         padding: 20px;
@@ -33,47 +33,68 @@ st.markdown("""
         margin-bottom: 10px;
     }
 
-    /* Botón principal */
+    /* 
+       MAIN BUTTON (GENERATE JSON) - ULTRA FORCE WHITE TEXT 
+       Apuntamos a todas las capas posibles del botón para que no haya duda
+    */
     .stButton>button {
-        background: linear-gradient(90deg, #1c5573 0%, #2a7da9 100%);
-        color: white;
-        border: none;
-        border-radius: 8px;
-        padding: 0.6rem 2rem;
-        font-weight: bold;
-        transition: all 0.3s ease;
-        width: 100%;
-    }
-    .stButton>button:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 5px 15px rgba(28, 85, 115, 0.3);
-        color: white;
+        background: linear-gradient(90deg, #1c5573 0%, #2a7da9 100%) !important;
+        border: none !important;
+        border-radius: 8px !important;
+        padding: 0.6rem 2rem !important;
+        width: 100% !important;
+        transition: all 0.3s ease !important;
     }
 
-    /* Títulos */
+    /* Selector específico para el texto dentro del botón */
+    .stButton>button, .stButton>button p, .stButton>button div, .stButton>button span {
+        color: white !important;
+        font-weight: normal !important;
+        text-decoration: none !important;
+    }
+    
+    /* Hover state */
+    .stButton>button:hover {
+        transform: translateY(-2px) !important;
+        box-shadow: 0 5px 15px rgba(28, 85, 115, 0.3) !important;
+    }
+
+    .stButton>button:hover p, .stButton>button:hover div {
+        color: white !important;
+    }
+
+    /* Power BI Download Buttons Style (Secondary) */
+    div[data-testid="stVerticalBlock"] > div:has(button[kind="secondary"]) button {
+        border: 1px solid #f2c811 !important;
+        color: #333 !important;
+        background-color: #fff !important;
+    }
+    div[data-testid="stVerticalBlock"] > div:has(button[kind="secondary"]) button:hover {
+        background-color: #f2c811 !important;
+        color: #000 !important;
+    }
+
+    /* Titles and Header text */
     h1 { color: #1c5573; font-weight: 800 !important; margin-bottom: 0px !important; }
     h3 { color: #495057; font-size: 1.2rem !important; margin-top: 0px !important; margin-bottom: 1rem !important; }
     
-    /* Inputs */
     .stTextInput>div>div>input {
         border-radius: 8px;
     }
 
-    /* Contenedor del encabezado - Sin márgenes negativos para evitar amontonamiento */
     .header-text-container {
         margin-bottom: 15px;
     }
     </style>
     """, unsafe_allow_html=True)
 
-# --- Encabezado con Logo y Título (Máximo Espaciado) ---
+# --- Header Section ---
 col_logo, col_title = st.columns([1, 4])
 
 with col_logo:
     st.image("logo_radware.png", width=200)
 
 with col_title:
-    # 'margin-left: 80px' empuja el título considerablemente a la derecha
     st.markdown("""
         <div style='padding-top: 28px; margin-left: 80px;' class='header-text-container'>
             <h1>AUTOREPORT</h1>
@@ -81,7 +102,7 @@ with col_title:
         </div>
         """, unsafe_allow_html=True)
 
-# --- Formulario de Entrada ---
+# --- Configuration Form ---
 with st.container():
     st.markdown("### 🛠️ Configuration")
     
@@ -91,7 +112,7 @@ with st.container():
         account_id = st.text_input("Account ID", placeholder="Enter Account ID")
     
     with col2:
-        x_api_key = st.text_input("X-API-KEY", type="password", placeholder="Paste secret key")
+        x_api_key = st.text_input("X-API-KEY", type="password", placeholder="Secret key")
         service = st.selectbox("Security Service", ["WAF", "BOT"])
 
     st.markdown("---")
@@ -108,9 +129,44 @@ with st.container():
 
     only_blocked = st.toggle("Only Blocked Events", value=True)
 
-# --- Lógica de Ejecución ---
+# --- Power BI Download Section ---
 st.markdown("<br>", unsafe_allow_html=True)
-if st.button("GENERATE JSON"):
+with st.expander("📊 Download Power BI Dashboards (.pbix)", expanded=False):
+    st.info("Download these templates to visualize the JSON data generated by this tool.")
+    pbi_col1, pbi_col2 = st.columns(2)
+    
+    pbi_waf_file = "CWAAP_AutoReport.pbix"
+    pbi_bot_file = "BOTM_AutoReport.pbix"
+
+    with pbi_col1:
+        if os.path.exists(pbi_waf_file):
+            with open(pbi_waf_file, "rb") as f:
+                st.download_button(
+                    label="📊 Download WAF PBIX",
+                    data=f,
+                    file_name="Radware_WAF_Dashboard.pbix",
+                    mime="application/octet-stream",
+                    use_container_width=True
+                )
+        else:
+            st.caption("WAF template file not found")
+
+    with pbi_col2:
+        if os.path.exists(pbi_bot_file):
+            with open(pbi_bot_file, "rb") as f:
+                st.download_button(
+                    label="🤖 Download BOT PBIX",
+                    data=f,
+                    file_name="Radware_BOT_Dashboard.pbix",
+                    mime="application/octet-stream",
+                    use_container_width=True
+                )
+        else:
+            st.caption("BOT template file not found")
+
+# --- Execution Logic ---
+st.markdown("<br>", unsafe_allow_html=True)
+if st.button("GENERATE JSON", use_container_width=True):
     if not domain or not x_api_key or not account_id:
         st.warning("⚠️ Please fill in all the required fields before proceeding.")
     else:
@@ -145,7 +201,7 @@ if st.button("GENERATE JSON"):
                         mime="application/json"
                     )
             else:
-                st.error("❌ File was not created. Please check the API logs and connectivity.")
+                st.error("❌ File was not created. Please check API logs and connectivity.")
                 
         except Exception as e:
             st.error(f"❌ Critical Error: {str(e)}")
