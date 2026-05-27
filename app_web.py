@@ -74,9 +74,9 @@ st.markdown("""
     /* Titles and Header text */
     h1 { color: #1c5573; font-weight: 800 !important; margin-bottom: 0px !important; }
     
-    /* Reducción del tamaño de los títulos Start y End */
+    /* Títulos Start y End restaurados a su color gris original */
     h3.range-title { 
-        color: #1c5573; 
+        color: #495057; 
         font-size: 1.15rem !important; 
         margin-top: 5px !important; 
         margin-bottom: 0px !important; 
@@ -87,9 +87,9 @@ st.markdown("""
         margin-top: -25px !important;
     }
     
-    /* Margen inferior ajustado para acercar el bloque de End al bloque de Start */
+    /* Reducción ultra agresiva del espacio entre el bloque Start y End */
     .start-container {
-        margin-bottom: -10px !important;
+        margin-bottom: -35px !important;
     }
 
     /* Eliminar cualquier padding superior interno de las columnas de entrada */
@@ -141,7 +141,7 @@ with st.container():
     dias_max = 30 if service == "WAF" else 7
     fecha_minima = datetime.now() - timedelta(days=dias_max)
     
-    # Generar listas de opciones para los selectbox (Formato 12 horas)
+    # Generar listas de opciones para los selectbox
     lista_horas_12 = [f"{i:02d}" for i in range(1, 13)]
     lista_minutos = [f"{i:02d}" for i in range(60)]
     lista_ampm = ["AM", "PM"]
@@ -153,11 +153,12 @@ with st.container():
     with col_s_date:
         start_date = st.date_input("Date", value=datetime.now() - timedelta(days=1), min_value=fecha_minima, label_visibility="visible", key="s_date_input")
     with col_s_hour:
-        start_hour = st.selectbox("Hour", options=lista_horas_12, index=11, key="start_hour") # Default 12
+        start_hour = st.selectbox("Hour", options=lista_horas_12, index=11, key="start_hour")
     with col_s_min:
         start_min = st.selectbox("Minute", options=lista_minutos, index=0, key="start_min")
     with col_s_ampm:
-        start_ampm = st.selectbox("AM/PM", options=lista_ampm, index=0, key="start_ampm") # Default AM (12:00 AM es medianoche)
+        # Se oculta la etiqueta superior "AM/PM" manteniendo su alineación
+        start_ampm = st.selectbox("AM/PM", options=lista_ampm, index=0, key="start_ampm", label_visibility="hidden")
     st.markdown("</div>", unsafe_allow_html=True)
         
     # --- RANGO DE FIN ---
@@ -166,11 +167,12 @@ with st.container():
     with col_e_date:
         end_date = st.date_input("Date", value=datetime.now(), label_visibility="visible", key="e_date_input")
     with col_e_hour:
-        end_hour = st.selectbox("Hour", options=lista_horas_12, index=10, key="end_hour") # Default 11
+        end_hour = st.selectbox("Hour", options=lista_horas_12, index=10, key="end_hour")
     with col_e_min:
         end_min = st.selectbox("Minute", options=lista_minutos, index=59, key="end_min")
     with col_e_ampm:
-        end_ampm = st.selectbox("AM/PM", options=lista_ampm, index=1, key="end_ampm") # Default PM (11:59 PM)
+        # Se oculta la etiqueta superior "AM/PM" manteniendo su alineación
+        end_ampm = st.selectbox("AM/PM", options=lista_ampm, index=1, key="end_ampm", label_visibility="hidden")
 
     st.markdown("<br>", unsafe_allow_html=True)
     only_blocked = st.toggle("Only Blocked Events", value=True)
@@ -198,7 +200,6 @@ if st.button("GENERATE JSON", use_container_width=True):
             h_end = 0
         end_time_24 = f"{h_end:02d}:{end_min}:59"
 
-        # Construimos las variables temporales finales en formato YYYY-MM-DD HH:MM:SS
         start_timestamp = f"{start_date} {start_time_24}"
         end_timestamp = f"{end_date} {end_time_24}"
 
