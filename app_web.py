@@ -18,13 +18,10 @@ st.markdown("""
     /* Background and Font */
     .main { background-color: #f8f9fa; }
     
-    /* ULTRA ENHANCEMENT: Máxima definición para el Logo y elementos gráficos */
+    /* Image Quality Enhancement */
     img {
-        image-rendering: -webkit-optimize-contrast !important; /* Safari/Chrome iOS */
-        image-rendering: crisp-edges !important;            /* Firefox */
-        image-rendering: pixelated !important;              /* Chrome/Edge/Opera */
-        backface-visibility: hidden;                        /* Evita el parpadeo y difuminado en aceleración por hardware */
-        -webkit-font-smoothing: antialiased;
+        image-rendering: -webkit-optimize-contrast;
+        image-rendering: crisp-edges;
     }
 
     /* Configuration Card Style */
@@ -36,7 +33,8 @@ st.markdown("""
         margin-bottom: 10px;
     }
 
-    /* MAIN BUTTON (GENERATE JSON) - ULTRA FORCE WHITE TEXT */
+    /* MAIN BUTTON (GENERATE JSON) - ULTRA FORCE WHITE TEXT 
+    */
     .stButton>button {
         background: linear-gradient(90deg, #1c5573 0%, #2a7da9 100%) !important;
         border: none !important;
@@ -76,29 +74,8 @@ st.markdown("""
 
     /* Titles and Header text */
     h1 { color: #1c5573; font-weight: 800 !important; margin-bottom: 0px !important; }
+    h3 { color: #495057; font-size: 1.2rem !important; margin-top: 0px !important; margin-bottom: 1rem !important; }
     
-    /* Títulos Start y End más grandes y adaptables al tema (Light/Dark) */
-    h3.range-title { 
-        font-size: 1.35rem !important; 
-        margin-top: 5px !important; 
-        margin-bottom: 0px !important; 
-    }
-    
-    /* Ajuste para pegar los selectores y la fecha al título h3 */
-    h3.range-title + div[data-testid="stHorizontalBlock"] {
-        margin-top: -25px !important;
-    }
-    
-    /* Reducción del espacio entre el bloque Start y End */
-    .start-container {
-        margin-bottom: -35px !important;
-    }
-
-    /* Eliminar cualquier padding superior interno de las columnas de entrada */
-    div[data-testid="stHorizontalBlock"] div[data-testid="column"] {
-        padding-top: 0px !important;
-    }
-
     .stTextInput>div>div>input {
         border-radius: 8px;
     }
@@ -113,8 +90,7 @@ st.markdown("""
 col_logo, col_title = st.columns([1, 4])
 
 with col_logo:
-    # Optimización: use_container_width=False asegura que respete el tamaño exacto sin estirarlo artificialmente
-    st.image("logo_radware.png", width=200, use_container_width=False)
+    st.image("logo_radware.png", width=200)
 
 with col_title:
     st.markdown("""
@@ -131,7 +107,7 @@ with st.container():
     col1, col2 = st.columns(2)
     with col1:
         domain = st.text_input("Application (Domain)", placeholder="example.com")
-        account_id = st.text_input("Account ID", placeholder="Enter Account ID")
+        account_id = st.text_input("Application Protection ID", placeholder="Enter Account ID")
     
     with col2:
         x_api_key = st.text_input("X-API-KEY", type="password", placeholder="Secret key")
@@ -140,44 +116,89 @@ with st.container():
     st.markdown("---")
     st.markdown("### 📅 Time Range & Filters")
     
-    # Configuración de límites de fecha
+    col3, col4 = st.columns(2)
     dias_max = 30 if service == "WAF" else 7
     fecha_minima = datetime.now() - timedelta(days=dias_max)
     
-    # Generar listas de opciones para los selectbox
-    lista_horas_12 = [f"{i:02d}" for i in range(1, 13)]
-    lista_minutos = [f"{i:02d}" for i in range(60)]
-    lista_ampm = ["AM", "PM"]
-    
-    # --- RANGO DE INICIO ---
-    st.markdown("<div class='start-container'>", unsafe_allow_html=True)
-    st.markdown("<h3 class='range-title'>Start</h3>", unsafe_allow_html=True)
-    col_s_date, col_s_hour, col_s_min, col_s_ampm = st.columns([2, 1, 1, 1])
-    with col_s_date:
-        start_date = st.date_input("Date", value=datetime.now() - timedelta(days=1), min_value=fecha_minima, label_visibility="visible", key="s_date_input")
-    with col_s_hour:
-        start_hour = st.selectbox("Hour", options=lista_horas_12, index=11, key="start_hour")
-    with col_s_min:
-        start_min = st.selectbox("Minute", options=lista_minutos, index=0, key="start_min")
-    with col_s_ampm:
-        start_ampm = st.selectbox("AM/PM", options=lista_ampm, index=0, key="start_ampm", label_visibility="hidden")
-    st.markdown("</div>", unsafe_allow_html=True)
-        
-    # --- RANGO DE FIN ---
-    st.markdown("<h3 class='range-title'>End</h3>", unsafe_allow_html=True)
-    col_e_date, col_e_hour, col_e_min, col_e_ampm = st.columns([2, 1, 1, 1])
-    with col_e_date:
-        end_date = st.date_input("Date", value=datetime.now(), label_visibility="visible", key="e_date_input")
-    with col_e_hour:
-        end_hour = st.selectbox("Hour", options=lista_horas_12, index=10, key="end_hour")
-    with col_e_min:
-        end_min = st.selectbox("Minute", options=lista_minutos, index=59, key="end_min")
-    with col_e_ampm:
-        end_ampm = st.selectbox("AM/PM", options=lista_ampm, index=1, key="end_ampm", label_visibility="hidden")
+    with col3:
+        start_date = st.date_input("Start Date", value=datetime.now() - timedelta(days=1), min_value=fecha_minima)
+    with col4:
+        end_date = st.date_input("End Date", value=datetime.now())
 
-    st.markdown("<br>", unsafe_allow_html=True)
     only_blocked = st.toggle("Only Blocked Events", value=True)
 
+# --- Power BI Download Section ---
+st.markdown("<br>", unsafe_allow_html=True)
+with st.expander("📊 Download Power BI Dashboards (.pbix)", expanded=False):
+    st.info("Download these templates to visualize the JSON data generated by this tool.")
+    
+    # --- Fila 1: Dashboards Generales ---
+    st.markdown("#### 📈 Executive & General Dashboards")
+    pbi_col1, pbi_col2 = st.columns(2)
+    
+    pbi_waf_file = "CWAAP_AutoReport.pbix"
+    pbi_bot_file = "BOTM_AutoReport.pbix"
+
+    with pbi_col1:
+        if os.path.exists(pbi_waf_file):
+            with open(pbi_waf_file, "rb") as f:
+                st.download_button(
+                    label="📊 Download BI WAF",
+                    data=f,
+                    file_name="Radware_WAF_Dashboard.pbix",
+                    mime="application/octet-stream",
+                    use_container_width=True
+                )
+        else:
+            st.caption("⚠️ WAF Executive template file not found")
+
+    with pbi_col2:
+        if os.path.exists(pbi_bot_file):
+            with open(pbi_bot_file, "rb") as f:
+                st.download_button(
+                    label="🤖 Download BI BOT",
+                    data=f,
+                    file_name="Radware_BOT_Dashboard.pbix",
+                    mime="application/octet-stream",
+                    use_container_width=True
+                )
+        else:
+            st.caption("⚠️ BOT Executive template file not found")
+            
+    st.markdown("<br>", unsafe_allow_html=True)
+    
+    # --- Fila 2: Dashboards de Análisis de Eventos ---
+    st.markdown("#### 🔍 Deep-Dive Event Analysis")
+    pbi_col3, pbi_col4 = st.columns(2)
+    
+    pbi_waf_analysis_file = "CWAAP_Event_Analysis.pbix"
+    pbi_bot_analysis_file = "BOTM_Event_Analysis.pbix"
+    
+    with pbi_col3:
+        if os.path.exists(pbi_waf_analysis_file):
+            with open(pbi_waf_analysis_file, "rb") as f:
+                st.download_button(
+                    label="🔬 Download BI WAF Event Analysis",
+                    data=f,
+                    file_name="Radware_WAF_Event_Analysis.pbix",
+                    mime="application/octet-stream",
+                    use_container_width=True
+                )
+        else:
+            st.caption("⚠️ WAF Event Analysis template file not found")
+
+    with pbi_col4:
+        if os.path.exists(pbi_bot_analysis_file):
+            with open(pbi_bot_analysis_file, "rb") as f:
+                st.download_button(
+                    label="🧠 Download BI BOT Event Analysis",
+                    data=f,
+                    file_name="Radware_BOT_Event_Analysis.pbix",
+                    mime="application/octet-stream",
+                    use_container_width=True
+                )
+        else:
+            st.caption("⚠️ BOT Event Analysis template file not found")
 
 # --- Execution Logic ---
 st.markdown("<br>", unsafe_allow_html=True)
@@ -185,31 +206,12 @@ if st.button("GENERATE JSON", use_container_width=True):
     if not domain or not x_api_key or not account_id:
         st.warning("⚠️ Please fill in all the required fields before proceeding.")
     else:
-        # --- Conversión de Start Time de 12h a 24h ---
-        h_start = int(start_hour)
-        if start_ampm == "PM" and h_start != 12:
-            h_start += 12
-        elif start_ampm == "AM" and h_start == 12:
-            h_start = 0
-        start_time_24 = f"{h_start:02d}:{start_min}:00"
-
-        # --- Conversión de End Time de 12h a 24h ---
-        h_end = int(end_hour)
-        if end_ampm == "PM" and h_end != 12:
-            h_end += 12
-        elif end_ampm == "AM" and h_end == 12:
-            h_end = 0
-        end_time_24 = f"{h_end:02d}:{end_min}:59"
-
-        start_timestamp = f"{start_date} {start_time_24}"
-        end_timestamp = f"{end_date} {end_time_24}"
-
         config = {
             "domain": domain,
             "x_api_key": x_api_key,
             "account_id": account_id,
-            "start": start_timestamp,
-            "end": end_timestamp,
+            "start": f"{start_date} 00:00:00",
+            "end": f"{end_date} 23:59:59",
             "service": service,
             "only_blocked": "y" if only_blocked else "n"
         }
@@ -239,80 +241,6 @@ if st.button("GENERATE JSON", use_container_width=True):
                 
         except Exception as e:
             st.error(f"❌ Critical Error: {str(e)}")
-
-
-# --- Power BI Download Section ---
-st.markdown("<br>", unsafe_allow_html=True)
-with st.expander("📊 Download Power BI Dashboards", expanded=False):
-    st.info("Download these templates to visualize the JSON data generated by this tool.")
-    
-    # --- Fila 1: Dashboards Generales ---
-    st.markdown("#### 📈 Executive & General Dashboards")
-    pbi_col1, pbi_col2 = st.columns(2)
-    
-    pbi_waf_file = "CWAAP_AutoReport.pbit"
-    pbi_bot_file = "BOTM_AutoReport.pbit"
-
-    with pbi_col1:
-        if os.path.exists(pbi_waf_file):
-            with open(pbi_waf_file, "rb") as f:
-                st.download_button(
-                    label="📊 Download Report WAF",
-                    data=f,
-                    file_name="Radware_WAF_Dashboard.pbit",
-                    mime="application/octet-stream",
-                    use_container_width=True
-                )
-        else:
-            st.caption("⚠️ WAF Executive template file not found")
-
-    with pbi_col2:
-        if os.path.exists(pbi_bot_file):
-            with open(pbi_bot_file, "rb") as f:
-                st.download_button(
-                    label="🤖 Download Report BOT",
-                    data=f,
-                    file_name="Radware_BOT_Dashboard.pbit",
-                    mime="application/octet-stream",
-                    use_container_width=True
-                )
-        else:
-            st.caption("⚠️ BOT Executive template file not found")
-            
-    st.markdown("<br>", unsafe_allow_html=True)
-    
-    # --- Fila 2: Dashboards de Análisis de Eventos ---
-    st.markdown("#### 🔍 Deep-Dive Event Analysis")
-    pbi_col3, pbi_col4 = st.columns(2)
-    
-    pbi_waf_analysis_file = "CWAAP_Event_Analysis.pbit"
-    pbi_bot_analysis_file = "BOTM_Event_Analysis.pbit"
-    
-    with pbi_col3:
-        if os.path.exists(pbi_waf_analysis_file):
-            with open(pbi_waf_analysis_file, "rb") as f:
-                st.download_button(
-                    label="🔬 Download WAF Event Analysis",
-                    data=f,
-                    file_name="Radware_WAF_Event_Analysis.pbit",
-                    mime="application/octet-stream",
-                    use_container_width=True
-                )
-        else:
-            st.caption("⚠️ WAF Event Analysis template file not found")
-
-    with pbi_col4:
-        if os.path.exists(pbi_bot_analysis_file):
-            with open(pbi_bot_analysis_file, "rb") as f:
-                st.download_button(
-                    label="🧠 Download BOT Event Analysis",
-                    data=f,
-                    file_name="Radware_BOT_Event_Analysis.pbit",
-                    mime="application/octet-stream",
-                    use_container_width=True
-                )
-        else:
-            st.caption("⚠️ BOT Event Analysis template file not found")
 
 # --- Footer ---
 st.markdown("<br><br>", unsafe_allow_html=True)
