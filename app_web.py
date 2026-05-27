@@ -75,9 +75,14 @@ st.markdown("""
     h1 { color: #1c5573; font-weight: 800 !important; margin-bottom: 0px !important; }
     h3 { color: #1c5573; font-size: 1.4rem !important; margin-top: 5px !important; margin-bottom: 0px !important; }
     
-    /* Reducir el espacio superior de las filas de inputs inmediatamente debajo de los títulos H3 */
+    /* Ajuste ULTRA agresivo para pegar los selectores y la fecha al título h3 */
     h3 + div[data-testid="stHorizontalBlock"] {
-        margin-top: -12px !important;
+        margin-top: -25px !important;
+    }
+    
+    /* Eliminar cualquier padding superior interno de las columnas de entrada */
+    h3 + div[data-testid="stHorizontalBlock"] div[data-testid="column"] {
+        padding-top: 0px !important;
     }
 
     .stTextInput>div>div>input {
@@ -138,7 +143,7 @@ with st.container():
     with col_s_min:
         start_min = st.selectbox("Minute", options=lista_minutos, index=0, key="start_min")
         
-    # Salto de línea para separar los bloques de tiempo (Inicio vs Fin)
+    # Salto de línea controlado para separar Start de End
     st.markdown("<br>", unsafe_allow_html=True)
         
     # --- RANGO DE FIN ---
