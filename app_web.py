@@ -124,7 +124,7 @@ with st.container():
     lista_minutos = [f"{i:02d}" for i in range(60)]
     
     # --- RANGO DE INICIO ---
-    st.markdown("### 🛫 Start Date & Time")
+    st.markdown("### Start Date")
     col_s_date, col_s_hour, col_s_min = st.columns([2, 1, 1])
     with col_s_date:
         start_date = st.date_input("Start Date", value=datetime.now() - timedelta(days=1), min_value=fecha_minima, label_visibility="hidden")
@@ -137,7 +137,7 @@ with st.container():
     st.markdown("<br>", unsafe_allow_html=True)
         
     # --- RANGO DE FIN ---
-    st.markdown("### 🛬 End Date & Time")
+    st.markdown("### End Date")
     col_e_date, col_e_hour, col_e_min = st.columns([2, 1, 1])
     with col_e_date:
         end_date = st.date_input("End Date", value=datetime.now(), label_visibility="hidden")
