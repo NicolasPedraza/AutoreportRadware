@@ -74,10 +74,9 @@ st.markdown("""
     /* Titles and Header text */
     h1 { color: #1c5573; font-weight: 800 !important; margin-bottom: 0px !important; }
     
-    /* Títulos Start y End restaurados a su color gris original */
+    /* Títulos Start y End más grandes y adaptables al tema (Light/Dark) */
     h3.range-title { 
-        color: #495057; 
-        font-size: 1.15rem !important; 
+        font-size: 1.35rem !important; 
         margin-top: 5px !important; 
         margin-bottom: 0px !important; 
     }
@@ -87,7 +86,7 @@ st.markdown("""
         margin-top: -25px !important;
     }
     
-    /* Reducción ultra agresiva del espacio entre el bloque Start y End */
+    /* Reducción del espacio entre el bloque Start y End */
     .start-container {
         margin-bottom: -35px !important;
     }
@@ -157,7 +156,6 @@ with st.container():
     with col_s_min:
         start_min = st.selectbox("Minute", options=lista_minutos, index=0, key="start_min")
     with col_s_ampm:
-        # Se oculta la etiqueta superior "AM/PM" manteniendo su alineación
         start_ampm = st.selectbox("AM/PM", options=lista_ampm, index=0, key="start_ampm", label_visibility="hidden")
     st.markdown("</div>", unsafe_allow_html=True)
         
@@ -171,7 +169,6 @@ with st.container():
     with col_e_min:
         end_min = st.selectbox("Minute", options=lista_minutos, index=59, key="end_min")
     with col_e_ampm:
-        # Se oculta la etiqueta superior "AM/PM" manteniendo su alineación
         end_ampm = st.selectbox("AM/PM", options=lista_ampm, index=1, key="end_ampm", label_visibility="hidden")
 
     st.markdown("<br>", unsafe_allow_html=True)
