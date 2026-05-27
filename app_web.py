@@ -131,7 +131,7 @@ with st.container():
     col1, col2 = st.columns(2)
     with col1:
         domain = st.text_input("Application (Domain)", placeholder="example.com")
-        account_id = st.text_input("Account ID", placeholder="Enter Account ID")
+        account_id = st.text_input("Application Protection ID", placeholder="Enter Account ID")
     
     with col2:
         x_api_key = st.text_input("X-API-KEY", type="password", placeholder="Secret key")
