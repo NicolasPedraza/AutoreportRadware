@@ -18,10 +18,13 @@ st.markdown("""
     /* Background and Font */
     .main { background-color: #f8f9fa; }
     
-    /* Image Quality Enhancement */
+    /* ULTRA ENHANCEMENT: Máxima definición para el Logo y elementos gráficos */
     img {
-        image-rendering: -webkit-optimize-contrast;
-        image-rendering: crisp-edges;
+        image-rendering: -webkit-optimize-contrast !important; /* Safari/Chrome iOS */
+        image-rendering: crisp-edges !important;            /* Firefox */
+        image-rendering: pixelated !important;              /* Chrome/Edge/Opera */
+        backface-visibility: hidden;                        /* Evita el parpadeo y difuminado en aceleración por hardware */
+        -webkit-font-smoothing: antialiased;
     }
 
     /* Configuration Card Style */
@@ -110,7 +113,8 @@ st.markdown("""
 col_logo, col_title = st.columns([1, 4])
 
 with col_logo:
-    st.image("logo_radware.png", width=200)
+    # Optimización: use_container_width=False asegura que respete el tamaño exacto sin estirarlo artificialmente
+    st.image("logo_radware.png", width=200, use_container_width=False)
 
 with col_title:
     st.markdown("""
