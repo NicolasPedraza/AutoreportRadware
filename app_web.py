@@ -75,7 +75,7 @@ st.markdown("""
     h1 { color: #1c5573; font-weight: 800 !important; margin-bottom: 0px !important; }
     h3 { color: #1c5573; font-size: 1.4rem !important; margin-top: 5px !important; margin-bottom: 0px !important; }
     
-    /* Ajuste ULTRA agresivo para pegar los selectores y la fecha al título h3 */
+    /* Ajuste para pegar los selectores y la fecha al título h3 */
     h3 + div[data-testid="stHorizontalBlock"] {
         margin-top: -25px !important;
     }
@@ -134,10 +134,11 @@ with st.container():
     lista_minutos = [f"{i:02d}" for i in range(60)]
     
     # --- RANGO DE INICIO ---
-    st.markdown("### 🛫 Start Date & Time")
+    st.markdown("### 🛫 Start")
     col_s_date, col_s_hour, col_s_min = st.columns([2, 1, 1])
     with col_s_date:
-        start_date = st.date_input("Start Date", value=datetime.now() - timedelta(days=1), min_value=fecha_minima, label_visibility="hidden")
+        # Se activa la visibilidad del label y se cambia el texto a "Date"
+        start_date = st.date_input("Date", value=datetime.now() - timedelta(days=1), min_value=fecha_minima, label_visibility="visible")
     with col_s_hour:
         start_hour = st.selectbox("Hour", options=lista_horas, index=0, key="start_hour")
     with col_s_min:
@@ -147,10 +148,11 @@ with st.container():
     st.markdown("<br>", unsafe_allow_html=True)
         
     # --- RANGO DE FIN ---
-    st.markdown("### 🛬 End Date & Time")
+    st.markdown("### 🛬 End")
     col_e_date, col_e_hour, col_e_min = st.columns([2, 1, 1])
     with col_e_date:
-        end_date = st.date_input("End Date", value=datetime.now(), label_visibility="hidden")
+        # Se activa la visibilidad del label y se cambia el texto a "Date"
+        end_date = st.date_input("Date", value=datetime.now(), label_visibility="visible")
     with col_e_hour:
         end_hour = st.selectbox("Hour", options=lista_horas, index=23, key="end_hour")
     with col_e_min:
