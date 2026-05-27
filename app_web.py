@@ -1,6 +1,6 @@
 import streamlit as st
 import os
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, time
 from main_waf import main_waf
 from main_bot import main_bot
 
@@ -33,8 +33,7 @@ st.markdown("""
         margin-bottom: 10px;
     }
 
-    /* MAIN BUTTON (GENERATE JSON) - ULTRA FORCE WHITE TEXT 
-    */
+    /* MAIN BUTTON (GENERATE JSON) - ULTRA FORCE WHITE TEXT */
     .stButton>button {
         background: linear-gradient(90deg, #1c5573 0%, #2a7da9 100%) !important;
         border: none !important;
@@ -116,30 +115,45 @@ with st.container():
     st.markdown("---")
     st.markdown("### 📅 Time Range & Filters")
     
-    col3, col4 = st.columns(2)
+    # Configuración de límites de fecha
     dias_max = 30 if service == "WAF" else 7
     fecha_minima = datetime.now() - timedelta(days=dias_max)
     
-    with col3:
-        start_date = st.date_input("Start Date", value=datetime.now() - timedelta(days=1), min_value=fecha_minima)
-    with col4:
-        end_date = st.date_input("End Date", value=datetime.now())
+    # Filas para Fecha y Hora de Inicio
+    st.markdown("**Start Date & Time**")
+    col_start_date, col_start_time = st.columns(2)
+    with col_start_date:
+        start_date = st.date_input("Date", value=datetime.now() - timedelta(days=1), min_value=fecha_minima, label_visibility="collapsed")
+    with col_start_time:
+        start_time = st.time_input("Time", value=time(0, 0), label_visibility="collapsed")
+        
+    # Filas para Fecha y Hora de Fin
+    st.markdown("**End Date & Time**")
+    col_end_date, col_end_time = st.columns(2)
+    with col_end_date:
+        end_date = st.date_input("Date", value=datetime.now(), label_visibility="collapsed")
+    with col_end_time:
+        end_time = st.time_input("Time", value=time(23, 59), label_visibility="collapsed")
 
     only_blocked = st.toggle("Only Blocked Events", value=True)
 
 
-# --- Execution Logic (MOVED HERE) ---
+# --- Execution Logic ---
 st.markdown("<br>", unsafe_allow_html=True)
 if st.button("GENERATE JSON", use_container_width=True):
     if not domain or not x_api_key or not account_id:
         st.warning("⚠️ Please fill in all the required fields before proceeding.")
     else:
+        # Combinamos la fecha seleccionada y la hora seleccionada en el formato string requerido
+        start_timestamp = f"{start_date} {start_time.strftime('%H:%M:%S')}"
+        end_timestamp = f"{end_date} {end_time.strftime('%H:%M:%S')}"
+
         config = {
             "domain": domain,
             "x_api_key": x_api_key,
             "account_id": account_id,
-            "start": f"{start_date} 00:00:00",
-            "end": f"{end_date} 23:59:59",
+            "start": start_timestamp,
+            "end": end_timestamp,
             "service": service,
             "only_blocked": "y" if only_blocked else "n"
         }
@@ -243,7 +257,6 @@ with st.expander("📊 Download Power BI Dashboards", expanded=False):
                 )
         else:
             st.caption("⚠️ BOT Event Analysis template file not found")
-
 
 # --- Footer ---
 st.markdown("<br><br>", unsafe_allow_html=True)
