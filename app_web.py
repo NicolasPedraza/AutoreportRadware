@@ -73,15 +73,27 @@ st.markdown("""
 
     /* Titles and Header text */
     h1 { color: #1c5573; font-weight: 800 !important; margin-bottom: 0px !important; }
-    h3 { color: #1c5573; font-size: 1.4rem !important; margin-top: 5px !important; margin-bottom: 0px !important; }
+    
+    /* Reducción del tamaño de los títulos Start y End */
+    h3.range-title { 
+        color: #1c5573; 
+        font-size: 1.15rem !important; 
+        margin-top: 5px !important; 
+        margin-bottom: 0px !important; 
+    }
     
     /* Ajuste para pegar los selectores y la fecha al título h3 */
-    h3 + div[data-testid="stHorizontalBlock"] {
+    h3.range-title + div[data-testid="stHorizontalBlock"] {
         margin-top: -25px !important;
     }
     
+    /* Margen inferior ajustado para acercar el bloque de End al bloque de Start */
+    .start-container {
+        margin-bottom: -10px !important;
+    }
+
     /* Eliminar cualquier padding superior interno de las columnas de entrada */
-    h3 + div[data-testid="stHorizontalBlock"] div[data-testid="column"] {
+    div[data-testid="stHorizontalBlock"] div[data-testid="column"] {
         padding-top: 0px !important;
     }
 
@@ -129,34 +141,36 @@ with st.container():
     dias_max = 30 if service == "WAF" else 7
     fecha_minima = datetime.now() - timedelta(days=dias_max)
     
-    # Generar listas de opciones para los selectbox
-    lista_horas = [f"{i:02d}" for i in range(24)]
+    # Generar listas de opciones para los selectbox (Formato 12 horas)
+    lista_horas_12 = [f"{i:02d}" for i in range(1, 13)]
     lista_minutos = [f"{i:02d}" for i in range(60)]
+    lista_ampm = ["AM", "PM"]
     
     # --- RANGO DE INICIO ---
-    st.markdown("### 🛫 Start")
-    col_s_date, col_s_hour, col_s_min = st.columns([2, 1, 1])
+    st.markdown("<div class='start-container'>", unsafe_allow_html=True)
+    st.markdown("<h3 class='range-title'>Start</h3>", unsafe_allow_html=True)
+    col_s_date, col_s_hour, col_s_min, col_s_ampm = st.columns([2, 1, 1, 1])
     with col_s_date:
-        # Se activa la visibilidad del label y se cambia el texto a "Date"
-        start_date = st.date_input("Date", value=datetime.now() - timedelta(days=1), min_value=fecha_minima, label_visibility="visible")
+        start_date = st.date_input("Date", value=datetime.now() - timedelta(days=1), min_value=fecha_minima, label_visibility="visible", key="s_date_input")
     with col_s_hour:
-        start_hour = st.selectbox("Hour", options=lista_horas, index=0, key="start_hour")
+        start_hour = st.selectbox("Hour", options=lista_horas_12, index=11, key="start_hour") # Default 12
     with col_s_min:
         start_min = st.selectbox("Minute", options=lista_minutos, index=0, key="start_min")
-        
-    # Salto de línea controlado para separar Start de End
-    st.markdown("<br>", unsafe_allow_html=True)
+    with col_s_ampm:
+        start_ampm = st.selectbox("AM/PM", options=lista_ampm, index=0, key="start_ampm") # Default AM (12:00 AM es medianoche)
+    st.markdown("</div>", unsafe_allow_html=True)
         
     # --- RANGO DE FIN ---
-    st.markdown("### 🛬 End")
-    col_e_date, col_e_hour, col_e_min = st.columns([2, 1, 1])
+    st.markdown("<h3 class='range-title'>End</h3>", unsafe_allow_html=True)
+    col_e_date, col_e_hour, col_e_min, col_e_ampm = st.columns([2, 1, 1, 1])
     with col_e_date:
-        # Se activa la visibilidad del label y se cambia el texto a "Date"
-        end_date = st.date_input("Date", value=datetime.now(), label_visibility="visible")
+        end_date = st.date_input("Date", value=datetime.now(), label_visibility="visible", key="e_date_input")
     with col_e_hour:
-        end_hour = st.selectbox("Hour", options=lista_horas, index=23, key="end_hour")
+        end_hour = st.selectbox("Hour", options=lista_horas_12, index=10, key="end_hour") # Default 11
     with col_e_min:
         end_min = st.selectbox("Minute", options=lista_minutos, index=59, key="end_min")
+    with col_e_ampm:
+        end_ampm = st.selectbox("AM/PM", options=lista_ampm, index=1, key="end_ampm") # Default PM (11:59 PM)
 
     st.markdown("<br>", unsafe_allow_html=True)
     only_blocked = st.toggle("Only Blocked Events", value=True)
@@ -168,9 +182,25 @@ if st.button("GENERATE JSON", use_container_width=True):
     if not domain or not x_api_key or not account_id:
         st.warning("⚠️ Please fill in all the required fields before proceeding.")
     else:
-        # Construimos el formato string uniendo la fecha, hora y minutos seleccionados
-        start_timestamp = f"{start_date} {start_hour}:{start_min}:00"
-        end_timestamp = f"{end_date} {end_hour}:{end_min}:59"
+        # --- Conversión de Start Time de 12h a 24h ---
+        h_start = int(start_hour)
+        if start_ampm == "PM" and h_start != 12:
+            h_start += 12
+        elif start_ampm == "AM" and h_start == 12:
+            h_start = 0
+        start_time_24 = f"{h_start:02d}:{start_min}:00"
+
+        # --- Conversión de End Time de 12h a 24h ---
+        h_end = int(end_hour)
+        if end_ampm == "PM" and h_end != 12:
+            h_end += 12
+        elif end_ampm == "AM" and h_end == 12:
+            h_end = 0
+        end_time_24 = f"{h_end:02d}:{end_min}:59"
+
+        # Construimos las variables temporales finales en formato YYYY-MM-DD HH:MM:SS
+        start_timestamp = f"{start_date} {start_time_24}"
+        end_timestamp = f"{end_date} {end_time_24}"
 
         config = {
             "domain": domain,
