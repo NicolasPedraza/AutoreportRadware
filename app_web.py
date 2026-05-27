@@ -1,6 +1,6 @@
 import streamlit as st
 import os
-from datetime import datetime, timedelta, time
+from datetime import datetime, timedelta
 from main_waf import main_waf
 from main_bot import main_bot
 
@@ -119,21 +119,29 @@ with st.container():
     dias_max = 30 if service == "WAF" else 7
     fecha_minima = datetime.now() - timedelta(days=dias_max)
     
-    # Filas para Fecha y Hora de Inicio
+    # Generar listas de opciones para los selectbox (con formato de dos dígitos)
+    lista_horas = [f"{i:02d}" for i in range(24)]
+    lista_minutos = [f"{i:02d}" for i in range(60)]
+    
+    # --- RANGO DE INICIO ---
     st.markdown("**Start Date & Time**")
-    col_start_date, col_start_time = st.columns(2)
-    with col_start_date:
-        start_date = st.date_input("Date", value=datetime.now() - timedelta(days=1), min_value=fecha_minima, label_visibility="collapsed")
-    with col_start_time:
-        start_time = st.time_input("Time", value=time(0, 0), label_visibility="collapsed")
+    col_s_date, col_s_hour, col_s_min = st.columns([2, 1, 1])
+    with col_s_date:
+        start_date = st.date_input("Start Date Selector", value=datetime.now() - timedelta(days=1), min_value=fecha_minima, label_visibility="collapsed")
+    with col_s_hour:
+        start_hour = st.selectbox("Hour", options=lista_horas, index=0, key="start_hour")
+    with col_s_min:
+        start_min = st.selectbox("Minute", options=lista_minutos, index=0, key="start_min")
         
-    # Filas para Fecha y Hora de Fin
+    # --- RANGO DE FIN ---
     st.markdown("**End Date & Time**")
-    col_end_date, col_end_time = st.columns(2)
-    with col_end_date:
-        end_date = st.date_input("Date", value=datetime.now(), label_visibility="collapsed")
-    with col_end_time:
-        end_time = st.time_input("Time", value=time(23, 59), label_visibility="collapsed")
+    col_e_date, col_e_hour, col_e_min = st.columns([2, 1, 1])
+    with col_e_date:
+        end_date = st.date_input("End Date Selector", value=datetime.now(), label_visibility="collapsed")
+    with col_e_hour:
+        end_hour = st.selectbox("Hour", options=lista_horas, index=23, key="end_hour")
+    with col_e_min:
+        end_min = st.selectbox("Minute", options=lista_minutos, index=59, key="end_min")
 
     only_blocked = st.toggle("Only Blocked Events", value=True)
 
@@ -144,9 +152,9 @@ if st.button("GENERATE JSON", use_container_width=True):
     if not domain or not x_api_key or not account_id:
         st.warning("⚠️ Please fill in all the required fields before proceeding.")
     else:
-        # Combinamos la fecha seleccionada y la hora seleccionada en el formato string requerido
-        start_timestamp = f"{start_date} {start_time.strftime('%H:%M:%S')}"
-        end_timestamp = f"{end_date} {end_time.strftime('%H:%M:%S')}"
+        # Construimos el formato string uniendo la fecha, hora y minutos seleccionados (agregando :00 para segundos)
+        start_timestamp = f"{start_date} {start_hour}:{start_min}:00"
+        end_timestamp = f"{end_date} {end_hour}:{end_min}:59"
 
         config = {
             "domain": domain,
