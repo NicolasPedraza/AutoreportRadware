@@ -119,7 +119,7 @@ with st.container():
     dias_max = 30 if service == "WAF" else 7
     fecha_minima = datetime.now() - timedelta(days=dias_max)
     
-    # Generar listas de opciones para los selectbox (con formato de dos dígitos)
+    # Generar listas de opciones para los selectbox
     lista_horas = [f"{i:02d}" for i in range(24)]
     lista_minutos = [f"{i:02d}" for i in range(60)]
     
@@ -127,7 +127,8 @@ with st.container():
     st.markdown("**Start Date & Time**")
     col_s_date, col_s_hour, col_s_min = st.columns([2, 1, 1])
     with col_s_date:
-        start_date = st.date_input("Start Date Selector", value=datetime.now() - timedelta(days=1), min_value=fecha_minima, label_visibility="collapsed")
+        # Se usa label_visibility="hidden" para reservar el espacio de la etiqueta y alinear las cajas
+        start_date = st.date_input("Start Date", value=datetime.now() - timedelta(days=1), min_value=fecha_minima, label_visibility="hidden")
     with col_s_hour:
         start_hour = st.selectbox("Hour", options=lista_horas, index=0, key="start_hour")
     with col_s_min:
@@ -137,7 +138,8 @@ with st.container():
     st.markdown("**End Date & Time**")
     col_e_date, col_e_hour, col_e_min = st.columns([2, 1, 1])
     with col_e_date:
-        end_date = st.date_input("End Date Selector", value=datetime.now(), label_visibility="collapsed")
+        # Se usa label_visibility="hidden" para reservar el espacio de la etiqueta y alinear las cajas
+        end_date = st.date_input("End Date", value=datetime.now(), label_visibility="hidden")
     with col_e_hour:
         end_hour = st.selectbox("Hour", options=lista_horas, index=23, key="end_hour")
     with col_e_min:
@@ -152,7 +154,7 @@ if st.button("GENERATE JSON", use_container_width=True):
     if not domain or not x_api_key or not account_id:
         st.warning("⚠️ Please fill in all the required fields before proceeding.")
     else:
-        # Construimos el formato string uniendo la fecha, hora y minutos seleccionados (agregando :00 para segundos)
+        # Construimos el formato string uniendo la fecha, hora y minutos seleccionados
         start_timestamp = f"{start_date} {start_hour}:{start_min}:00"
         end_timestamp = f"{end_date} {end_hour}:{end_min}:59"
 
