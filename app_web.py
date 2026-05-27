@@ -73,8 +73,13 @@ st.markdown("""
 
     /* Titles and Header text */
     h1 { color: #1c5573; font-weight: 800 !important; margin-bottom: 0px !important; }
-    h3 { color: #1c5573; font-size: 1.4rem !important; margin-top: 5px !important; margin-bottom: 0.5rem !important; }
+    h3 { color: #1c5573; font-size: 1.4rem !important; margin-top: 5px !important; margin-bottom: 0px !important; }
     
+    /* Reducir el espacio superior de las filas de inputs inmediatamente debajo de los títulos H3 */
+    h3 + div[data-testid="stHorizontalBlock"] {
+        margin-top: -12px !important;
+    }
+
     .stTextInput>div>div>input {
         border-radius: 8px;
     }
@@ -124,7 +129,7 @@ with st.container():
     lista_minutos = [f"{i:02d}" for i in range(60)]
     
     # --- RANGO DE INICIO ---
-    st.markdown("### Start Date")
+    st.markdown("### 🛫 Start Date & Time")
     col_s_date, col_s_hour, col_s_min = st.columns([2, 1, 1])
     with col_s_date:
         start_date = st.date_input("Start Date", value=datetime.now() - timedelta(days=1), min_value=fecha_minima, label_visibility="hidden")
@@ -133,11 +138,11 @@ with st.container():
     with col_s_min:
         start_min = st.selectbox("Minute", options=lista_minutos, index=0, key="start_min")
         
-    # Salto de línea para separar rangos de tiempo
+    # Salto de línea para separar los bloques de tiempo (Inicio vs Fin)
     st.markdown("<br>", unsafe_allow_html=True)
         
     # --- RANGO DE FIN ---
-    st.markdown("### End Date")
+    st.markdown("### 🛬 End Date & Time")
     col_e_date, col_e_hour, col_e_min = st.columns([2, 1, 1])
     with col_e_date:
         end_date = st.date_input("End Date", value=datetime.now(), label_visibility="hidden")
