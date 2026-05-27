@@ -127,6 +127,50 @@ with st.container():
 
     only_blocked = st.toggle("Only Blocked Events", value=True)
 
+
+# --- Execution Logic (MOVED HERE) ---
+st.markdown("<br>", unsafe_allow_html=True)
+if st.button("GENERATE JSON", use_container_width=True):
+    if not domain or not x_api_key or not account_id:
+        st.warning("⚠️ Please fill in all the required fields before proceeding.")
+    else:
+        config = {
+            "domain": domain,
+            "x_api_key": x_api_key,
+            "account_id": account_id,
+            "start": f"{start_date} 00:00:00",
+            "end": f"{end_date} 23:59:59",
+            "service": service,
+            "only_blocked": "y" if only_blocked else "n"
+        }
+
+        try:
+            with st.spinner(f"Connecting to Radware Cloud for {domain}..."):
+                if service == "WAF":
+                    main_waf(config)
+                    generated_file = f"{domain}.json"
+                else:
+                    main_bot(config)
+                    generated_file = f"{domain}_bot.json"
+
+            if os.path.exists(generated_file):
+                st.balloons()
+                st.success(f"✨ Report for {domain} is ready!")
+                
+                with open(generated_file, "rb") as f:
+                    st.download_button(
+                        label="⬇️ Download JSON Report",
+                        data=f,
+                        file_name=generated_file,
+                        mime="application/json"
+                    )
+            else:
+                st.error("❌ File was not created. Please check API logs and connectivity.")
+                
+        except Exception as e:
+            st.error(f"❌ Critical Error: {str(e)}")
+
+
 # --- Power BI Download Section ---
 st.markdown("<br>", unsafe_allow_html=True)
 with st.expander("📊 Download Power BI Dashboards", expanded=False):
@@ -200,47 +244,6 @@ with st.expander("📊 Download Power BI Dashboards", expanded=False):
         else:
             st.caption("⚠️ BOT Event Analysis template file not found")
 
-# --- Execution Logic ---
-st.markdown("<br>", unsafe_allow_html=True)
-if st.button("GENERATE JSON", use_container_width=True):
-    if not domain or not x_api_key or not account_id:
-        st.warning("⚠️ Please fill in all the required fields before proceeding.")
-    else:
-        config = {
-            "domain": domain,
-            "x_api_key": x_api_key,
-            "account_id": account_id,
-            "start": f"{start_date} 00:00:00",
-            "end": f"{end_date} 23:59:59",
-            "service": service,
-            "only_blocked": "y" if only_blocked else "n"
-        }
-
-        try:
-            with st.spinner(f"Connecting to Radware Cloud for {domain}..."):
-                if service == "WAF":
-                    main_waf(config)
-                    generated_file = f"{domain}.json"
-                else:
-                    main_bot(config)
-                    generated_file = f"{domain}_bot.json"
-
-            if os.path.exists(generated_file):
-                st.balloons()
-                st.success(f"✨ Report for {domain} is ready!")
-                
-                with open(generated_file, "rb") as f:
-                    st.download_button(
-                        label="⬇️ Download JSON Report",
-                        data=f,
-                        file_name=generated_file,
-                        mime="application/json"
-                    )
-            else:
-                st.error("❌ File was not created. Please check API logs and connectivity.")
-                
-        except Exception as e:
-            st.error(f"❌ Critical Error: {str(e)}")
 
 # --- Footer ---
 st.markdown("<br><br>", unsafe_allow_html=True)
