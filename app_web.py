@@ -73,7 +73,7 @@ st.markdown("""
 
     /* Titles and Header text */
     h1 { color: #1c5573; font-weight: 800 !important; margin-bottom: 0px !important; }
-    h3 { color: #495057; font-size: 1.2rem !important; margin-top: 0px !important; margin-bottom: 1rem !important; }
+    h3 { color: #1c5573; font-size: 1.4rem !important; margin-top: 5px !important; margin-bottom: 0.5rem !important; }
     
     .stTextInput>div>div>input {
         border-radius: 8px;
@@ -124,27 +124,29 @@ with st.container():
     lista_minutos = [f"{i:02d}" for i in range(60)]
     
     # --- RANGO DE INICIO ---
-    st.markdown("**Start Date & Time**")
+    st.markdown("### 🛫 Start Date & Time")
     col_s_date, col_s_hour, col_s_min = st.columns([2, 1, 1])
     with col_s_date:
-        # Se usa label_visibility="hidden" para reservar el espacio de la etiqueta y alinear las cajas
         start_date = st.date_input("Start Date", value=datetime.now() - timedelta(days=1), min_value=fecha_minima, label_visibility="hidden")
     with col_s_hour:
         start_hour = st.selectbox("Hour", options=lista_horas, index=0, key="start_hour")
     with col_s_min:
         start_min = st.selectbox("Minute", options=lista_minutos, index=0, key="start_min")
         
+    # Salto de línea para separar rangos de tiempo
+    st.markdown("<br>", unsafe_allow_html=True)
+        
     # --- RANGO DE FIN ---
-    st.markdown("**End Date & Time**")
+    st.markdown("### 🛬 End Date & Time")
     col_e_date, col_e_hour, col_e_min = st.columns([2, 1, 1])
     with col_e_date:
-        # Se usa label_visibility="hidden" para reservar el espacio de la etiqueta y alinear las cajas
         end_date = st.date_input("End Date", value=datetime.now(), label_visibility="hidden")
     with col_e_hour:
         end_hour = st.selectbox("Hour", options=lista_horas, index=23, key="end_hour")
     with col_e_min:
         end_min = st.selectbox("Minute", options=lista_minutos, index=59, key="end_min")
 
+    st.markdown("<br>", unsafe_allow_html=True)
     only_blocked = st.toggle("Only Blocked Events", value=True)
 
 
