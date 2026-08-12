@@ -35,6 +35,12 @@ def get_json_waf_blocked(lower, upper, x_api_key, account_id, app_id):
                 "field": "action",
                 "value": "Blocked"
             },
+			{
+		      "type": "termFilter",
+		      "field": "targetModule",
+		      "value": "Tunnel Module",
+		      "inverseFilter": true
+		    },
             {
                 "field":"enrichmentContainer.applicationId",
                 "inverseFilter": False,
