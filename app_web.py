@@ -141,7 +141,7 @@ with st.container():
     st.markdown("### 📅 Time Range & Filters")
     
     # Configuración de límites de fecha
-    dias_max = 30 if service == "WAF" else 7
+    dias_max = 90 if service == "WAF" else 7
     fecha_minima = datetime.now() - timedelta(days=dias_max)
     
     # Generar listas de opciones para los selectbox
