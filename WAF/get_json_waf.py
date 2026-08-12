@@ -34,7 +34,7 @@ def get_json_waf(lower, upper, x_api_key, account_id, app_id):
 		      "type": "termFilter",
 		      "field": "targetModule",
 		      "value": "Tunnel Module",
-		      "inverseFilter": true
+		      "inverseFilter": True
 		    },
             {
                 "type": "orFilter",
